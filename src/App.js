@@ -6,6 +6,7 @@ import { LinkContainer } from "react-router-bootstrap";
 
 import Routes from './Routes';
 import { AppContext } from './libs/contextLib';
+import { onError } from './libs/errorLib';
 
 import './app.scss'
 
@@ -24,7 +25,7 @@ function App() {
       userHasAuthenticated(true);
     } catch(error) {
       if (error !== 'No current user') {
-        alert(error);
+        onError(error);
       }
     }
     setIsAuthenticating(false);
