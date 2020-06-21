@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import { Auth } from "aws-amplify";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { useAppContext } from '../../libs/contextLib';
 
 import './login.scss';
 
 const Login = () => {
+    // This is telling React that we want to use our app context here and that we want to be able to use the userHasAuthenticated function.
+    const {userHasAuthenticated} = useAppContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -11,8 +15,16 @@ const Login = () => {
         return email.length > 0 && email.length > 0;
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+
+        try {
+            await Auth.signIn(email, password);
+            console.log('user logged in');
+            userHasAuthenticated(true);
+        } catch {
+            alert(event.message);
+        }
     }
 
     return (
@@ -22,20 +34,24 @@ const Login = () => {
                 <ControlLabel>Email</ControlLabel>
                 <FormControl
                     autoFocus
-                    type="email"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={event => setEmail(event.target.value)}
+                    type="email"
                 />
                 </FormGroup>
                 <FormGroup controlId="password" bsSize="large">
                 <ControlLabel>Password</ControlLabel>
                 <FormControl
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={event => setPassword(event.target.value)}
                     type="password"
                 />
                 </FormGroup>
-                <Button block bsSize="large" disabled={!validateForm()} type="submit">
+                <Button
+                    block
+                    bsSize="large"
+                    disabled={!validateForm()}
+                    type="submit">
                 Login
                 </Button>
             </form>
