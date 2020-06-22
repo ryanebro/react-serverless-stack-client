@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Auth } from "aws-amplify";
 import { useHistory } from 'react-router-dom';
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 
 import { useAppContext } from '../../libs/contextLib';
+import { useFormFields } from '../../libs/hooksLib';
 import LoaderButton from '../../components/LoaderButton/LoaderButton';
 import { onError } from '../../libs/errorLib';
 
@@ -14,11 +15,13 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     // This is telling React that we want to use our app context here and that we want to be able to use the userHasAuthenticated function.
     const {userHasAuthenticated} = useAppContext();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [fields, handleFieldChange] = useFormFields({
+        email: '',
+        password: ''
+    })
 
     function validateForm() {
-        return email.length > 0 && email.length > 0;
+        return fields.email.length > 0 && fields.password.length > 0;
     }
 
     async function handleSubmit(event) {
@@ -26,7 +29,7 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            await Auth.signIn(email, password);
+            await Auth.signIn(fields.email, fields.password);
             console.log('user logged in');
             userHasAuthenticated(true);
             history.push('/');
@@ -43,16 +46,16 @@ const Login = () => {
                 <ControlLabel>Email</ControlLabel>
                 <FormControl
                     autoFocus
-                    value={email}
-                    onChange={event => setEmail(event.target.value)}
+                    value={fields.email}
+                    onChange={handleFieldChange}
                     type="email"
                 />
                 </FormGroup>
                 <FormGroup controlId="password" bsSize="large">
                 <ControlLabel>Password</ControlLabel>
                 <FormControl
-                    value={password}
-                    onChange={event => setPassword(event.target.value)}
+                    value={fields.password}
+                    onChange={handleFieldChange}
                     type="password"
                 />
                 </FormGroup>
