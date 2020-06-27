@@ -1,4 +1,5 @@
 import React, {useRef, useState} from 'react';
+import { API } from 'aws-amplify';
 import { useHistory } from "react-router-dom";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 
@@ -8,6 +9,8 @@ import { onError } from "../../libs/errorLib";
 import config from "../../config";
 
 import './new-note.scss';
+import { createContext } from 'react';
+import { s3Upload } from '../../libs/awsLib';
 
 const NewNote = () => {
     const file = useRef(null); // useRef does not cause rerender, simply tells React to store a value for us so that we can use it later
@@ -23,6 +26,14 @@ const NewNote = () => {
         file.current = event.target.files[0];
     }
 
+    function createNote(note) {
+        console.log('note: ', note)
+
+        return API.post('notes', '/notes', {
+            body: note
+        })
+    }
+
     async function handleSubmit(event) {
         event.preventDefault();
 
@@ -34,6 +45,17 @@ const NewNote = () => {
         }
 
         setIsLoading(true);
+
+        try {
+            // upload image first before creating note
+            const attachment = file.current ? await s3Upload(file.current) : null;
+
+            await createNote({content, attachment});
+            history.push('/');
+        } catch(error) {
+            onError(error);
+            setIsLoading(false);
+        }
     }
 
     return (
