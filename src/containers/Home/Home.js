@@ -41,7 +41,7 @@ export default function Home() {
       index !== 0 ? (
         <LinkContainer key={note.noteId} to={`/notes/${note.noteId}`}>
           {/* render first line of each notes as header */}
-          <ListGroupItem header={note.content.trim().split("\n")[0]}>
+          <ListGroupItem header={note.title}>
             {"Created: " + new Date(note.createdAt).toLocaleString()}
           </ListGroupItem>
         </LinkContainer>

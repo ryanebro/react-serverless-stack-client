@@ -15,6 +15,7 @@ import { s3Upload } from "../../libs/awsLib";
 const NewNote = () => {
   const file = useRef(null); // useRef does not cause rerender, simply tells React to store a value for us so that we can use it later
   const history = useHistory();
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -51,7 +52,8 @@ const NewNote = () => {
       // upload image first before creating note
       const attachment = file.current ? await s3Upload(file.current) : null;
 
-      await createNote({ content, attachment });
+      await createNote({ title, content, attachment });
+      console.log(`createNote: ${{ title, content, attachment }}`)
       history.push("/");
     } catch (error) {
       onError(error);
@@ -62,7 +64,15 @@ const NewNote = () => {
   return (
     <div className="NewNote">
       <form onSubmit={handleSubmit}>
+        <FormGroup controlId="title">
+          <ControlLabel>Title</ControlLabel>
+          <FormControl
+            value={title}
+            onChange={event => setTitle(event.target.value)}
+          />
+        </FormGroup>
         <FormGroup controlId="content">
+          <ControlLabel>Note</ControlLabel>
           <FormControl
             value={content}
             componentClass="textarea"

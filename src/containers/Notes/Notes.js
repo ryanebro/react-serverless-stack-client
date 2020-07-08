@@ -22,12 +22,13 @@ export default function Notes() {
     async function onLoad() {
       try {
         const note = await loadNote();
-        const { content, attachment } = note;
+        const { title, content, attachment } = note;
 
         if (attachment) {
           note.attachmentURL = await Storage.vault.get(attachment);
         }
 
+        setTitle(title);
         setContent(content);
         setNote(note);
       } catch (error) {
