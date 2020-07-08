@@ -3,8 +3,8 @@ import { API } from "aws-amplify";
 import { LinkContainer } from "react-router-bootstrap";
 import { PageHeader, ListGroup, ListGroupItem } from "react-bootstrap";
 
-import { useAppContext } from '../../libs/contextLib';
-import { onError } from '../../libs/errorLib';
+import { useAppContext } from "../../libs/contextLib";
+import { onError } from "../../libs/errorLib";
 
 import "./home.scss";
 
@@ -63,18 +63,16 @@ export default function Home() {
         <h1>Scratch</h1>
         <p>a simple note taking app</p>
       </div>
-    )
+    );
   }
 
   function renderNotes() {
     return (
       <div className="notes">
         <PageHeader>Your Notes</PageHeader>
-        <ListGroup>
-          {!isLoading && renderNotesList(notes)}
-        </ListGroup>
+        <ListGroup>{!isLoading && renderNotesList(notes)}</ListGroup>
       </div>
-    )
+    );
   }
 
   return (

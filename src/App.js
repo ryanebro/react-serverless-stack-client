@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Auth } from 'aws-amplify';
+import React, { useState, useEffect } from "react";
+import { Auth } from "aws-amplify";
 import { Link, useHistory } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
-import Routes from './Routes';
-import { AppContext } from './libs/contextLib';
-import { onError } from './libs/errorLib';
+import Routes from "./Routes";
+import { AppContext } from "./libs/contextLib";
+import { onError } from "./libs/errorLib";
 
-import './app.scss'
+import "./app.scss";
 
 function App() {
   const history = useHistory();
@@ -23,8 +23,8 @@ function App() {
     try {
       await Auth.currentSession();
       userHasAuthenticated(true);
-    } catch(error) {
-      if (error !== 'No current user') {
+    } catch (error) {
+      if (error !== "No current user") {
         onError(error);
       }
     }
@@ -34,25 +34,25 @@ function App() {
   async function handleLogout() {
     await Auth.signOut();
     userHasAuthenticated(false);
-    history.push('/login');
+    history.push("/login");
   }
 
   return (
-    !isAuthenticating &&
-    <div className="App container">
-      <Navbar fluid collapseOnSelect>
-        <Navbar.Header>
-          <Navbar.Brand>
-            <Link to="/">Scratch</Link>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
-        <Navbar.Collapse>
-          <Nav pullRight>
-            {
-              isAuthenticated
-              ? <NavItem onClick={handleLogout}>Logout</NavItem>
-              : <>
+    !isAuthenticating && (
+      <div className="App container">
+        <Navbar fluid collapseOnSelect>
+          <Navbar.Header>
+            <Navbar.Brand>
+              <Link to="/">Scratch</Link>
+            </Navbar.Brand>
+            <Navbar.Toggle />
+          </Navbar.Header>
+          <Navbar.Collapse>
+            <Nav pullRight>
+              {isAuthenticated ? (
+                <NavItem onClick={handleLogout}>Logout</NavItem>
+              ) : (
+                <>
                   <LinkContainer to="/signup">
                     <NavItem>Signup</NavItem>
                   </LinkContainer>
@@ -60,16 +60,17 @@ function App() {
                     <NavItem>Login</NavItem>
                   </LinkContainer>
                 </>
-            }
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
 
-      {/* AppContext Provider: all the child components inside the Context Provider should be able to access what we put in it */}
-      <AppContext.Provider value={{isAuthenticated, userHasAuthenticated}}>
-        <Routes />
-      </AppContext.Provider>
-    </div>
+        {/* AppContext Provider: all the child components inside the Context Provider should be able to access what we put in it */}
+        <AppContext.Provider value={{ isAuthenticated, userHasAuthenticated }}>
+          <Routes />
+        </AppContext.Provider>
+      </div>
+    )
   );
 }
 
