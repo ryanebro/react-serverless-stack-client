@@ -50,6 +50,10 @@ export default function Notes() {
     })
   }
 
+  function deleteNote() {
+    return API.del("notes", `/notes/${id}`);
+  }
+
   function validateForm() {
     return content.length > 0;
   }
@@ -107,6 +111,15 @@ export default function Notes() {
     if (!confirmed) return;
 
     setIsDeleting(true);
+
+    // TODO: you might have noticed that we are not deleting the attachment when we are deleting a note.
+    try {
+      await deleteNote();
+      history.push('/');
+    } catch (error) {
+      onError(error);
+      setIsDeleting(false);
+    }
   }
 
   return (
