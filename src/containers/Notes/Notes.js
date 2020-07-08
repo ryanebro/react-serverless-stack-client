@@ -89,6 +89,7 @@ export default function Notes() {
       }
 
       await saveNote({
+        title,
         content,
         attachment: attachment || note.attachment
       });
