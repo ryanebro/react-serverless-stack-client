@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Auth } from "aws-amplify";
-import { useHistory } from "react-router-dom";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 
 import { useAppContext } from "../../libs/contextLib";
@@ -11,7 +10,6 @@ import { onError } from "../../libs/errorLib";
 import "./login.scss";
 
 const Login = () => {
-  const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
   // This is telling React that we want to use our app context here and that we want to be able to use the userHasAuthenticated function.
   const { userHasAuthenticated } = useAppContext();
@@ -32,7 +30,6 @@ const Login = () => {
       await Auth.signIn(fields.email, fields.password);
       console.log("user logged in");
       userHasAuthenticated(true);
-      history.push("/");
     } catch (error) {
       onError(error);
       setIsLoading(false);
