@@ -14,12 +14,12 @@ const Routes = () => {
   return (
     <Switch>
       <Route exact path="/" component={Home} />
-      <UnauthenticatedRoute exact path="/login" />
+      <UnauthenticatedRoute exact path="/login">
         <Login />
-      <UnauthenticatedRoute />
-      <UnauthenticatedRoute exact path="/signup" />
+      </UnauthenticatedRoute>
+      <UnauthenticatedRoute exact path="/signup">
         <SignUp />
-      <UnauthenticatedRoute />
+      </UnauthenticatedRoute>
       <AuthenticatedRoute exact path="/notes/new">
         <NewNote />
       </AuthenticatedRoute>

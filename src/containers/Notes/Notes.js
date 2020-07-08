@@ -5,14 +5,16 @@ import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 
 import { onError } from "../../libs/errorLib";
 import LoaderButton from "../../components/LoaderButton/LoaderButton";
+import {s3Upload} from "../../libs/awsLib";
 import config from "../../config";
 
 export default function Notes() {
   const file = useRef(null);
-  const { id } = useParams();
   const history = useHistory();
+  const { id } = useParams();
   const [note, setNote] = useState(null);
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -40,6 +42,14 @@ export default function Notes() {
     return API.get("notes", `/notes/${id}`);
   }
 
+  function saveNote(note) {
+    // We save the note by making a PUT request with the note object to /notes/:id where we get the id from the useParams hook. We use the API.put() method from AWS Amplify.
+    // TODO: You might have noticed that we are not deleting the old attachment when we upload a new one.
+    return API.put("notes", `/notes/${id}`, {
+      body: note
+    })
+  }
+
   function validateForm() {
     return content.length > 0;
   }
@@ -54,6 +64,7 @@ export default function Notes() {
   }
 
   async function handleSubmit(event) {
+    let attachment;
     event.preventDefault();
 
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
@@ -65,6 +76,23 @@ export default function Notes() {
     }
 
     setIsLoading(true);
+
+    try {
+      // If there is a file to upload we call s3Upload to upload it and save the key we get from S3. If there isn’t then we simply save the existing attachment object, note.attachment.
+      if (file.current) {
+        attachment = await s3Upload(file.current);
+      }
+
+      await saveNote({
+        content,
+        attachment: attachment || note.attachment
+      });
+
+      history.push('/');
+    } catch (error) {
+      onError(error);
+      setIsLoading(false);
+    }
   }
 
   async function handleDelete(event) {
@@ -85,11 +113,17 @@ export default function Notes() {
     <div className="Notes">
       {note && (
         <form onSubmit={handleSubmit}>
+          <FormGroup controlId="title">
+            <FormControl
+              value={title}
+              onChange={event => setTitle(event.target.value)}
+            />
+          </FormGroup>
           <FormGroup controlId="content">
             <FormControl
               value={content}
               componentClass="textarea"
-              onChange={e => setContent(e.target.value)}
+              onChange={event => setContent(event.target.value)}
             />
           </FormGroup>
           {note.attachment && (
